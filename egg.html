@@ -5,6 +5,14 @@
         
         
         <!-- ここまで -->
+        <link rel="stylesheet" href="egg.css">
+        <style>
+            canvas {
+                background: #9fb;
+                display: block;
+                margin: 0 auto;
+            }
+        </style>
     </head>
     <body>
         <!-- 柿原 編集可能 -->
@@ -13,8 +21,243 @@
         <!-- ここまで -->
 
         <!-- game 國久 -->
-        
-        
+        <canvas id="eggCanvas" width="800" height="800"></canvas>
+        <script>
+            const canvas = document.getElementById("eggCanvas");
+            const ctx = canvas.getContext("2d");
+            const x = 4;
+            const y = 9;
+            const sleeptime = 500;
+            const block_x = 110;
+            const block_y = 80;
+            const entity = 6;
+            const color_list = ["#062","#f00","#0f0","#00f","#ff0","#0ff","#f0f"]
+            let mat = [];
+            var dead = false;
+            var setlist = [0,0,0,0];
+            var select = 1;
+            var set = false;
+            var change = false;
+            var newobjx_1 = 0;
+            var newobjx_2 = 0;
+            var rightPressed=false;
+            var leftPressed=false;
+            var spacePressed=false;
+            var dellist=[[0,1,1],[0,1,1]];
+            var score=0;
+            const obj = []
+            for( i = 0; i < entity+1; i++){
+                obj.push({
+                    number:i,
+                    fall:true,
+                    color:color_list[i]
+                });
+            }
+            for(let i = 0; i < x; i++){
+                mat.push([]);
+                for(let j = 0; j < y; j++){
+                    mat[i].push(obj[0]);
+                }
+            }
+            document.addEventListener("keydown", keyDownHandler, true);
+            document.addEventListener("keyup", keyUpHandler, true);
+
+            function keyDownHandler(e) {
+                if(!dead){
+                    if(!rightPressed && !leftPressed){
+                        if(e.key == "ArrowRight") {
+                            rightPressed = true;
+                            if(select==3){}
+                            else{select++;}
+                        }
+                        else if(e.key == "ArrowLeft") {
+                            leftPressed = true;
+                            if(select==1){}
+                            else{select--;}
+                        }
+                        drawselect();
+                    }
+                    if(!spacePressed){
+                        if(e.key == " "){
+                            spacePressed=!spacePressed
+                            changeline();
+                        }
+                    }
+                }
+            }
+            function keyUpHandler(e) {
+                if(rightPressed || leftPressed){
+                    if(e.key == "ArrowRight") {
+                        rightPressed = false;
+                    }
+                    else if(e.key == "ArrowLeft") {
+                        leftPressed = false;
+                    }
+                }
+                if(spacePressed){
+                    if(e.key == " "){
+                        spacePressed=!spacePressed
+                    }
+                }
+            }
+            
+            function falling(){
+                if( dellist[0][0] || dellist[1][0]){
+                    console.log( "delete",dellist[0][0] , dellist[1][0] ,dellist[0][0] || dellist[1][0])
+                    var a = mat[dellist[0][1]][dellist[0][2]]["number"] == mat[dellist[0][1]][dellist[0][2]-1]["number"]
+                    var b = mat[dellist[1][1]][dellist[1][2]]["number"] == mat[dellist[1][1]][dellist[1][2]-1]["number"]
+                    if(a){
+                        console.log("delete_a")
+                        deleteobj(0,dellist[0][1],dellist[0][2]);
+                    }
+                    if(b){
+                        console.log("delete_b")
+                        deleteobj(1,dellist[1][1],dellist[1][2]);
+                    }
+                }else{
+                    dellist=[[0,1,1],[0,1,1]];
+                    console.log(dellist[1])
+                    change = false;
+                    for(i=0;i<x;i++){
+                        for(j=1;j<y;j++){
+                            if(mat[i][j]["number"]==0 ){continue;}
+                            if(mat[i][j]["fall"] && mat[i][j-1]["number"]==0){
+                                mat[i][j-1]=JSON.parse(JSON.stringify(mat[i][j]));
+                                mat[i][j]=obj[0];
+                                change = true;
+                                if(j==1){
+                                    mat[i][j-1]["fall"]=false;
+                                }
+                                else if(mat[i][j-1]["fall"] && !mat[i][j-2]["fall"]){
+                                    mat[i][j-1]["fall"]=false;
+                                    if(!dellist[0][0]){
+                                        dellist[0]=[1,i,j-1];
+                                    }else{
+                                        dellist[1]=[1,i,j-1];
+                                    }
+                                }
+                            }else if(mat[i][j]["fall"] && mat[i][j-1]["number"]!=0){
+                                mat[i][j]["fall"]=false;
+                                if(!dellist[0][0]){dellist[0]=[1,i,j];}
+                                else{dellist[1]=[1,i,j];}
+                            }
+                        }
+                    }
+                }
+            }
+            function changeline(){
+                for(i=0;i<y;i++){
+                    if( !mat[select][i]["fall"] || !mat[select-1][i]["fall"]){
+                        [mat[select][i],mat[select-1][i]] = [mat[select-1][i],mat[select][i]];
+                    }
+                }
+                drawobj();
+            }
+            function newobj(){
+                if(!set){
+                    newobjx_1 = Math.floor( Math.random() * (x) ) + 1;
+                    newobjx_2 = Math.floor( Math.random() * (x) ) + 1;
+                    while(newobjx_1 == newobjx_2){
+                        newobjx_2 = Math.floor( Math.random() * (x) ) + 1;
+                    }
+                    set = true;
+                    setlist[newobjx_1-1] = Math.floor( Math.random() * (entity)) + 1;
+                    setlist[newobjx_2-1] = Math.floor( Math.random() * (entity)) + 1;
+                    console.log(setlist,1);
+                }
+                if(!change){
+                    console.log(setlist,2);
+                    for(i=0;i<x;i++){
+                        mat[i][y-1] = JSON.parse(JSON.stringify(obj[setlist[i]]));
+                    }
+                    set = false;
+                    setlist=[0,0,0,0];
+                }
+            }
+            function deleteobj(n,a,b){
+                console.log(n,a,b);
+                if(mat[a][b]["number"]!=0 && mat[a][b]["number"]==mat[a][b-1]["number"]){
+                    mat[a][b]=obj[0];
+                    mat[a][b-1]=obj[0];
+                    score+=10
+                }
+            }
+            function drawobj(){
+                for(i=0; i<x; i++){
+                    ctx.beginPath();
+                    ctx.clearRect(30+(block_x+2)*i, 20, block_x, block_y);
+                    ctx.rect(30+(block_x+2)*i, 20, block_x, block_y);
+                    ctx.fillStyle = mat[i][y-1]["color"];
+                    ctx.fill();
+                    ctx.closePath();
+                    for(j=y-2; j>-1; j--){
+                        ctx.beginPath();
+                        ctx.rect(30+(block_x+2)*i, 25+(block_y+2)*(y-j-1), block_x, block_y);
+                        ctx.fillStyle = mat[i][j]["color"];
+                        ctx.fill();
+                        ctx.closePath();
+                    }
+                }
+            }
+            function death(){
+                dead = false;
+                for(i=0;i<4;i++){
+                    if(!mat[i][y-1]["fall"]){
+                        dead = true;
+                    }
+                }
+                return dead;
+            }
+            function drawselect(){
+                ctx.beginPath();
+                ctx.clearRect(0, 25+(block_y+2)*y, canvas.width, 10);
+                ctx.rect(30+(block_x+2)*(select-1), 25+(block_y+2)*y, (block_x+1)*2, 10);
+                ctx.fillStyle = "#f00";
+                ctx.fill();
+                ctx.closePath();
+            }
+            function system(waitSec){
+                setTimeout(function(){
+                    if(death()){
+                        result();
+                    }else{
+                        system(sleeptime);
+                        falling();
+                        draw();
+                    }
+                },waitSec)
+            }
+            function drawbar(){
+                ctx.beginPath();
+                ctx.rect(25,101,(block_x+4)*4,3);
+                ctx.fillStyle = "#000";
+                ctx.fill();
+                ctx.closePath();
+            }
+            function drawScore(){
+                ctx.font = "64px serif";
+                ctx.fillStyle = "#ee9020";
+                ctx.fillText("スコア: "+score, 500, 100);
+            }
+            function draw(){
+                newobj();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawbar();
+                drawScore();
+                drawselect();
+                drawobj();
+            }
+            function result(){
+                ctx.beginPath();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = "64px serif";
+                ctx.fillStyle = "#ee9020";
+                ctx.fillText("あなたのスコア: "+score+"点", canvas.width/10, canvas.height/4);
+                ctx.closePath();
+            }
+            draw();
+            system(sleeptime);
+        </script>
         <!-- 國久ここまで -->
 
         <!-- 柿原 編集可能 -->
