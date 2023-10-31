@@ -5,14 +5,6 @@
         
         
         <!-- ここまで -->
-        <link rel="stylesheet" href="egg.css">
-        <style>
-            canvas {
-                background: #9fb;
-                display: block;
-                margin: 0 auto;
-            }
-        </style>
     </head>
     <body>
         <!-- 柿原 編集可能 -->
@@ -27,15 +19,16 @@
             const ctx = canvas.getContext("2d");
             const x = 4;
             const y = 9;
-            const sleeptime = 500;
+            const sleeptime = 50;
             const block_x = 110;
             const block_y = 80;
             const entity = 6;
-            const color_list = ["#062","#f00","#0f0","#00f","#ff0","#0ff","#f0f"]
+            const color_list = ["pictures/sakuranbo.png","pictures/suika_ue.png","pictures/suika_shita.png","pictures/meron.png","pictures/mikan.png","pictures/ichigo.png","pictures/pain.png"]
             let mat = [];
             var dead = false;
             var setlist = [0,0,0,0];
             var select = 1;
+            var home = true;
             var set = false;
             var change = false;
             var newobjx_1 = 0;
@@ -50,8 +43,10 @@
                 obj.push({
                     number:i,
                     fall:true,
+                    image:new Image(),
                     color:color_list[i]
                 });
+                obj[i]["image"] = obj[i]["color"];
             }
             for(let i = 0; i < x; i++){
                 mat.push([]);
@@ -61,16 +56,29 @@
             }
             document.addEventListener("keydown", keyDownHandler, true);
             document.addEventListener("keyup", keyUpHandler, true);
-
+            // 入力判定
             function keyDownHandler(e) {
-                if(!dead){
+                if(home){
+                    if(!spacePressed){
+                        console.log("start!");
+                        if(e.key == " "){
+                            console.log(obj[2]["image"]);
+                            spacePressed=!spacePressed
+                            home = !home
+                            system();
+                        }
+                    }
+                }else if(!dead){
+                    console.log("down"+e.key, rightPressed , leftPressed)
                     if(!rightPressed && !leftPressed){
                         if(e.key == "ArrowRight") {
+                            console.log(select)
                             rightPressed = true;
                             if(select==3){}
                             else{select++;}
                         }
                         else if(e.key == "ArrowLeft") {
+                            console.log(select)
                             leftPressed = true;
                             if(select==1){}
                             else{select--;}
@@ -84,13 +92,16 @@
                         }
                     }
                 }
+
             }
             function keyUpHandler(e) {
                 if(rightPressed || leftPressed){
                     if(e.key == "ArrowRight") {
+                        console.log("up")
                         rightPressed = false;
                     }
                     else if(e.key == "ArrowLeft") {
+                        console.log("up")
                         leftPressed = false;
                     }
                 }
@@ -100,7 +111,18 @@
                     }
                 }
             }
-            
+            // let imagepath = "/pictures/_haikei.png"
+            function drawbackground(){
+                const image_background = new Image();
+                image_background.src="pictures/_haikei.png";
+                image_background.addEventListener("load", function (){
+                    ctx.drawImage(image_background,0,0);
+                    console.log("load!");
+                    start();
+                });
+            }
+            // drawbackground();
+            // 一段落下させる
             function falling(){
                 if( dellist[0][0] || dellist[1][0]){
                     console.log( "delete",dellist[0][0] , dellist[1][0] ,dellist[0][0] || dellist[1][0])
@@ -114,8 +136,8 @@
                         console.log("delete_b")
                         deleteobj(1,dellist[1][1],dellist[1][2]);
                     }
-                }else{
                     dellist=[[0,1,1],[0,1,1]];
+                }else{
                     console.log(dellist[1])
                     change = false;
                     for(i=0;i<x;i++){
@@ -131,20 +153,23 @@
                                 else if(mat[i][j-1]["fall"] && !mat[i][j-2]["fall"]){
                                     mat[i][j-1]["fall"]=false;
                                     if(!dellist[0][0]){
+                                        console.log("q");
                                         dellist[0]=[1,i,j-1];
                                     }else{
+                                        console.log("w");
                                         dellist[1]=[1,i,j-1];
                                     }
                                 }
                             }else if(mat[i][j]["fall"] && mat[i][j-1]["number"]!=0){
                                 mat[i][j]["fall"]=false;
-                                if(!dellist[0][0]){dellist[0]=[1,i,j];}
-                                else{dellist[1]=[1,i,j];}
+                                if(!dellist[0][0]){console.log("e");dellist[0]=[1,i,j];}
+                                else{console.log("r");dellist[1]=[1,i,j];}
                             }
                         }
                     }
                 }
             }
+            // 選択している列を入れ替える
             function changeline(){
                 for(i=0;i<y;i++){
                     if( !mat[select][i]["fall"] || !mat[select-1][i]["fall"]){
@@ -153,6 +178,7 @@
                 }
                 drawobj();
             }
+            // 新しく表示するタイルの生成
             function newobj(){
                 if(!set){
                     newobjx_1 = Math.floor( Math.random() * (x) ) + 1;
@@ -174,6 +200,7 @@
                     setlist=[0,0,0,0];
                 }
             }
+            // くっついたタイルの削除
             function deleteobj(n,a,b){
                 console.log(n,a,b);
                 if(mat[a][b]["number"]!=0 && mat[a][b]["number"]==mat[a][b-1]["number"]){
@@ -181,24 +208,33 @@
                     mat[a][b-1]=obj[0];
                     score+=10
                 }
+                dellist[n]=[0,1,1];
             }
+            // タイルの表示
             function drawobj(){
                 for(i=0; i<x; i++){
-                    ctx.beginPath();
-                    ctx.clearRect(30+(block_x+2)*i, 20, block_x, block_y);
-                    ctx.rect(30+(block_x+2)*i, 20, block_x, block_y);
-                    ctx.fillStyle = mat[i][y-1]["color"];
-                    ctx.fill();
-                    ctx.closePath();
-                    for(j=y-2; j>-1; j--){
+                    
+                    // mat[i][y-1]["image"].src = mat[i][y-1]["color"];
+                    // ctx.beginPath();
+                    // ctx.clearRect(30+(block_x+2)*i, 20, block_x, block_y,);
+                    // ctx.rect(30+(block_x+2)*i, 20, block_x, block_y);
+                    // ctx.fillStyle = mat[i][y-1]["color"];
+                    // ctx.fill();
+                    // ctx.drawImage(mat[i][y-1]["image"],0,0,300,300,30+(block_x+2)*i,25,block_x, block_y);
+                    // ctx.closePath();
+                    for(j=y; j>0; j--){
+                        // console.log(mat[i][y-1]["image"]);
+                        // mat[i][y-1]["image"].src = mat[i][y-1]["color"];
                         ctx.beginPath();
-                        ctx.rect(30+(block_x+2)*i, 25+(block_y+2)*(y-j-1), block_x, block_y);
-                        ctx.fillStyle = mat[i][j]["color"];
-                        ctx.fill();
+                        // ctx.rect(30+(block_x+2)*i, 25+(block_y+2)*(y-j-1), block_x, block_y);
+                        // ctx.fillStyle = mat[i][j]["color"];
+                        // ctx.fill();
+                        ctx.drawImage(mat[i][y-1]["image"],0,0,300,300,30+(block_x+2)*i,25+(block_y+2)*(j),block_x, block_y);
                         ctx.closePath();
                     }
                 }
             }
+            // ゲームオーバー判定
             function death(){
                 dead = false;
                 for(i=0;i<4;i++){
@@ -208,14 +244,23 @@
                 }
                 return dead;
             }
+            // 画面下部のセレクトバーの表示
             function drawselect(){
-                ctx.beginPath();
-                ctx.clearRect(0, 25+(block_y+2)*y, canvas.width, 10);
-                ctx.rect(30+(block_x+2)*(select-1), 25+(block_y+2)*y, (block_x+1)*2, 10);
-                ctx.fillStyle = "#f00";
-                ctx.fill();
-                ctx.closePath();
+                // ctx.beginPath();
+                // ctx.clearRect(0, 25+(block_y+2)*y, canvas.width, 10);
+                for(j=0; j<x; j++){
+                    ctx.beginPath();
+                    ctx.rect(30+(block_x+2)*j, 25+(block_y+2)*(y), block_x, 10);
+                    if(j==select || j==select-1){ctx.fillStyle = "#0f0";}
+                    else{ctx.fillStyle = "#000";}
+                    ctx.fill();
+                    ctx.closePath();
+                }
+                // ctx.fillStyle = "#f00";
+                // ctx.fill();
+                // ctx.closePath();
             }
+            // 定期的に関数を実行するための関数
             function system(waitSec){
                 setTimeout(function(){
                     if(death()){
@@ -227,6 +272,7 @@
                     }
                 },waitSec)
             }
+            // 一段目下の棒の表示
             function drawbar(){
                 ctx.beginPath();
                 ctx.rect(25,101,(block_x+4)*4,3);
@@ -234,19 +280,35 @@
                 ctx.fill();
                 ctx.closePath();
             }
+            // スコアの表示
             function drawScore(){
                 ctx.font = "64px serif";
                 ctx.fillStyle = "#ee9020";
                 ctx.fillText("スコア: "+score, 500, 100);
             }
+            // ゲームの表示
             function draw(){
                 newobj();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawbar();
                 drawScore();
                 drawselect();
                 drawobj();
             }
+            // スタート画面の表示
+            function start(){
+                // drawbackground();
+                ctx.beginPath();
+                var [x,y]=[200,400];
+                ctx.moveTo(x,y);
+                ctx.lineTo(x+17,y+10);
+                ctx.lineTo(x,y+20);
+                ctx.style="#000"
+                ctx.fill()
+                ctx.closePath();
+                // ctx.fill();
+            }
+            // リザルト画面の表示
             function result(){
                 ctx.beginPath();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -255,8 +317,10 @@
                 ctx.fillText("あなたのスコア: "+score+"点", canvas.width/10, canvas.height/4);
                 ctx.closePath();
             }
-            draw();
-            system(sleeptime);
+            drawbackground();
+            // start();
+            // draw();
+            // system(sleeptime);
         </script>
         <!-- 國久ここまで -->
 
