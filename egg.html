@@ -14,12 +14,15 @@
 
         <!-- game 國久 -->
         <canvas id="eggCanvas" width="800" height="800"></canvas>
+        <div style="display: none;">
+            <img id = "ichigo" src="pictures/ichigo.png" width="300" height="300" />
+        </div>
         <script>
             const canvas = document.getElementById("eggCanvas");
             const ctx = canvas.getContext("2d");
             const x = 4;
             const y = 9;
-            const sleeptime = 50;
+            const sleeptime = 200;
             const block_x = 110;
             const block_y = 80;
             const entity = 6;
@@ -39,15 +42,19 @@
             var dellist=[[0,1,1],[0,1,1]];
             var score=0;
             const obj = []
-            for( i = 0; i < entity+1; i++){
+            function setimage(i){
                 obj.push({
                     number:i,
                     fall:true,
-                    image:new Image(),
                     color:color_list[i]
                 });
-                obj[i]["image"] = obj[i]["color"];
+                // console.log(obj[i]["image"])
+                // obj[i]["image"].src = color_list;
             }
+            for( i = 0; i < entity+1; i++){
+                setimage(i);
+            }
+
             for(let i = 0; i < x; i++){
                 mat.push([]);
                 for(let j = 0; j < y; j++){
@@ -62,7 +69,9 @@
                     if(!spacePressed){
                         console.log("start!");
                         if(e.key == " "){
-                            console.log(obj[2]["image"]);
+                            for(i=0;i<6;i++){
+                                console.log(obj[i]["image"]);
+                            }
                             spacePressed=!spacePressed
                             home = !home
                             system();
@@ -138,7 +147,7 @@
                     }
                     dellist=[[0,1,1],[0,1,1]];
                 }else{
-                    console.log(dellist[1])
+                    console.log(mat)
                     change = false;
                     for(i=0;i<x;i++){
                         for(j=1;j<y;j++){
@@ -176,7 +185,11 @@
                         [mat[select][i],mat[select-1][i]] = [mat[select-1][i],mat[select][i]];
                     }
                 }
-                drawobj();
+                for(i=0;i<x;i++){
+                    for(j=y-1;j>-1;j--){
+                        drawobj(new Image(), i,j);
+                    }
+                }
             }
             // 新しく表示するタイルの生成
             function newobj(){
@@ -211,8 +224,10 @@
                 dellist[n]=[0,1,1];
             }
             // タイルの表示
-            function drawobj(){
-                for(i=0; i<x; i++){
+            function drawobj(image,i,j){
+                image.src=mat[i][j]["color"];
+                // const image = mat[i][j]["image"];
+                // for(i=0; i<x; i++){
                     
                     // mat[i][y-1]["image"].src = mat[i][y-1]["color"];
                     // ctx.beginPath();
@@ -222,17 +237,17 @@
                     // ctx.fill();
                     // ctx.drawImage(mat[i][y-1]["image"],0,0,300,300,30+(block_x+2)*i,25,block_x, block_y);
                     // ctx.closePath();
-                    for(j=y; j>0; j--){
+                    // for(j=y; j>0; j--){
                         // console.log(mat[i][y-1]["image"]);
                         // mat[i][y-1]["image"].src = mat[i][y-1]["color"];
-                        ctx.beginPath();
-                        // ctx.rect(30+(block_x+2)*i, 25+(block_y+2)*(y-j-1), block_x, block_y);
-                        // ctx.fillStyle = mat[i][j]["color"];
-                        // ctx.fill();
-                        ctx.drawImage(mat[i][y-1]["image"],0,0,300,300,30+(block_x+2)*i,25+(block_y+2)*(j),block_x, block_y);
-                        ctx.closePath();
-                    }
-                }
+                // ctx.beginPath();
+                // ctx.rect(30+(block_x+2)*i, 25+(block_y+2)*(y-j-1), block_x, block_y);
+                // ctx.fillStyle = mat[i][j]["color"];
+                // ctx.fill();
+                ctx.drawImage(image,0,0,300,300,30+(block_x+2)*i,25+(block_y+2)*(y-j-1),block_x, block_y);
+                // ctx.closePath();
+                    // }
+                // }
             }
             // ゲームオーバー判定
             function death(){
@@ -293,20 +308,25 @@
                 drawbar();
                 drawScore();
                 drawselect();
-                drawobj();
+                for(i=0;i<x;i++){
+                    for(j=y-1;j>-1;j--){
+                        drawobj(new Image(), i,j);
+                    }
+                }
             }
             // スタート画面の表示
             function start(){
-                // drawbackground();
-                ctx.beginPath();
-                var [x,y]=[200,400];
-                ctx.moveTo(x,y);
-                ctx.lineTo(x+17,y+10);
-                ctx.lineTo(x,y+20);
-                ctx.style="#000"
-                ctx.fill()
-                ctx.closePath();
-                // ctx.fill();
+                // // drawbackground();
+                // ctx.beginPath();
+                // var [x,y]=[200,400];
+                // ctx.moveTo(x,y);
+                // ctx.lineTo(x+17,y+10);
+                // ctx.lineTo(x,y+20);
+                // ctx.style="#000"
+                // ctx.fill()
+                // ctx.closePath();
+                // // ctx.fill();
+                // draw();
             }
             // リザルト画面の表示
             function result(){
