@@ -22,7 +22,7 @@
             const ctx = canvas.getContext("2d");
             const x = 4;
             const y = 9;
-            const sleeptime = 200;
+            const sleeptime = 50;
             const block_x = 110;
             const block_y = 80;
             const entity = 6;
@@ -394,7 +394,32 @@
             }
             // リザルト画面の表示
             function result(){
-                drawbackground();
+                start()
+                const image_background = new Image();
+                image_background.src="pictures/_haikei.png";
+                ctx.drawImage(image_background,0,0);
+                ctx.beginPath();
+                ctx.rect(200,100,400,600);
+                ctx.fillStyle="#000";
+                ctx.fill();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.rect(205,105,390,590);
+                ctx.fillStyle="#0d0";
+                ctx.fill();
+                ctx.closePath();
+                const scoreimage = new Image();
+                scoreimage.src ="pictures/_score.png" 
+                ctx.drawImage(scoreimage,280,150);
+                const score_ichi = new Image();
+                var ichi = score % 10;
+                score_ichi.src= number_list[ichi];
+                const score_juu = new Image();
+                var juu = Math.floor(score / 10) % 10;
+                if(score==0){juu=10;}
+                score_juu.src= number_list[juu];
+                ctx.drawImage(score_ichi,350,200);
+                ctx.drawImage(score_juu,300,200);
             }
             drawbackground();
             // start();
