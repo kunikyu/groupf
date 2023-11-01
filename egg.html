@@ -26,7 +26,28 @@
             const block_x = 110;
             const block_y = 80;
             const entity = 6;
-            const color_list = ["pictures/sakuranbo.png","pictures/suika_ue.png","pictures/suika_shita.png","pictures/meron.png","pictures/mikan.png","pictures/ichigo.png","pictures/pain.png"]
+            const color_list = [
+                "pictures/kudamono_touka.png",
+                "pictures/suika_ue.png",
+                "pictures/suika_shita.png",
+                "pictures/meron.png",
+                "pictures/mikan.png",
+                "pictures/ichigo.png",
+                "pictures/pain.png"
+            ]
+            const number_list = [
+                "pictures/0.png",
+                "pictures/1.png",
+                "pictures/2.png",
+                "pictures/3.png",
+                "pictures/4.png",
+                "pictures/5.png",
+                "pictures/6.png",
+                "pictures/7.png",
+                "pictures/8.png",
+                "pictures/9.png",
+                "pictures/0_emp.png"
+            ]
             let mat = [];
             var dead = false;
             var setlist = [0,0,0,0];
@@ -74,6 +95,7 @@
                             }
                             spacePressed=!spacePressed
                             home = !home
+                            drawbackground();
                             system();
                         }
                     }
@@ -124,11 +146,28 @@
             function drawbackground(){
                 const image_background = new Image();
                 image_background.src="pictures/_haikei.png";
+                const title = new Image();
+                title.src = "pictures/title.png";
                 image_background.addEventListener("load", function (){
-                    ctx.drawImage(image_background,0,0);
                     console.log("load!");
-                    start();
+                    ctx.drawImage(image_background,0,0);
+                    if(home){
+                        ctx.drawImage(title,1,1,400,200,100,250,600,300);
+                    }
                 });
+            }
+            // ゲーム背景
+            function back(){
+                ctx.beginPath();
+                ctx.rect(15,10,480,780);
+                ctx.fillStyle = "#000"
+                ctx.fill();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.rect(20,15,470,770);
+                ctx.fillStyle = "#0d0"
+                ctx.fill();
+                ctx.closePath();
             }
             // drawbackground();
             // 一段落下させる
@@ -185,6 +224,11 @@
                         [mat[select][i],mat[select-1][i]] = [mat[select-1][i],mat[select][i]];
                     }
                 }
+                // draw();
+                back();
+                drawbar();
+                drawScore(new Image(),score);
+                drawselect();
                 for(i=0;i<x;i++){
                     for(j=y-1;j>-1;j--){
                         drawobj(new Image(), i,j);
@@ -266,7 +310,7 @@
                 for(j=0; j<x; j++){
                     ctx.beginPath();
                     ctx.rect(30+(block_x+2)*j, 25+(block_y+2)*(y), block_x, 10);
-                    if(j==select || j==select-1){ctx.fillStyle = "#0f0";}
+                    if(j==select || j==select-1){ctx.fillStyle = "#f00";}
                     else{ctx.fillStyle = "#000";}
                     ctx.fill();
                     ctx.closePath();
@@ -291,22 +335,42 @@
             function drawbar(){
                 ctx.beginPath();
                 ctx.rect(25,101,(block_x+4)*4,3);
-                ctx.fillStyle = "#000";
+                ctx.fillStyle = "#fff";
                 ctx.fill();
                 ctx.closePath();
             }
             // スコアの表示
-            function drawScore(){
-                ctx.font = "64px serif";
-                ctx.fillStyle = "#ee9020";
-                ctx.fillText("スコア: "+score, 500, 100);
+            function drawScore(image,score){
+                ctx.beginPath();
+                ctx.rect(50+(block_x+2)*i,10,270,400);
+                ctx.fillStyle = "#000"
+                ctx.fill();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.rect(55+(block_x+2)*i,15,260,390);
+                ctx.fillStyle = "#0d0"
+                ctx.fill();
+                ctx.closePath();
+                const score_ichi = new Image();
+                var ichi = score % 10;
+                score_ichi.src= number_list[ichi];
+                const score_juu = new Image();
+                var juu = Math.floor(score / 10) % 10;
+                if(score==0){juu=10;}
+                score_juu.src= number_list[juu];
+                image.src = "pictures/_score.png"
+                ctx.drawImage(image,50+(block_x+2)*i,25);
+                ctx.drawImage(score_ichi,700,75);
+                ctx.drawImage(score_juu,650,75);
+                
             }
             // ゲームの表示
             function draw(){
                 newobj();
                 // ctx.clearRect(0, 0, canvas.width, canvas.height);
+                back();
                 drawbar();
-                drawScore();
+                drawScore(new Image(),score);
                 drawselect();
                 for(i=0;i<x;i++){
                     for(j=y-1;j>-1;j--){
@@ -330,12 +394,7 @@
             }
             // リザルト画面の表示
             function result(){
-                ctx.beginPath();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.font = "64px serif";
-                ctx.fillStyle = "#ee9020";
-                ctx.fillText("あなたのスコア: "+score+"点", canvas.width/10, canvas.height/4);
-                ctx.closePath();
+                drawbackground();
             }
             drawbackground();
             // start();
