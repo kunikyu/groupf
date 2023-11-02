@@ -169,6 +169,10 @@
                 ctx.fill();
                 ctx.closePath();
             }
+            function sleep(waitMsec) {
+                var startMsec = new Date();
+                while (new Date() - startMsec < waitMsec);
+            }
             // drawbackground();
             // 一段落下させる
             function falling(){
@@ -323,7 +327,16 @@
             function system(waitSec){
                 setTimeout(function(){
                     if(death()){
-                        result();
+                        sleep(sleeptime);
+                        ctx.beginPath();
+                        ctx.clearRect(0,0,800,800);
+                        ctx.closePath();
+                        const image_background = new Image();
+                        image_background.src="pictures/_haikei.png";
+                        image_background.addEventListener("load",function(){
+                            ctx.drawImage(image_background,0,0);
+                            result();
+                        })
                     }else{
                         system(sleeptime);
                         falling();
@@ -356,12 +369,17 @@
                 score_ichi.src= number_list[ichi];
                 const score_juu = new Image();
                 var juu = Math.floor(score / 10) % 10;
-                if(score==0){juu=10;}
+                if(score<10){juu=10;}
                 score_juu.src= number_list[juu];
+                const score_hyaku = new Image();
+                var hyaku = Math.floor(score / 100) % 10;
+                if(score<100){hyaku=10;}
+                score_hyaku.src = number_list[hyaku];
                 image.src = "pictures/_score.png"
                 ctx.drawImage(image,50+(block_x+2)*i,25);
-                ctx.drawImage(score_ichi,700,75);
+                ctx.drawImage(score_hyaku,600,75);
                 ctx.drawImage(score_juu,650,75);
+                ctx.drawImage(score_ichi,700,75);
                 
             }
             // ゲームの表示
@@ -391,13 +409,11 @@
                 // ctx.closePath();
                 // // ctx.fill();
                 // draw();
+                // ctx.beginPath(); 
             }
             // リザルト画面の表示
             function result(){
-                start()
-                const image_background = new Image();
-                image_background.src="pictures/_haikei.png";
-                ctx.drawImage(image_background,0,0);
+                start();
                 ctx.beginPath();
                 ctx.rect(200,100,400,600);
                 ctx.fillStyle="#000";
@@ -416,10 +432,15 @@
                 score_ichi.src= number_list[ichi];
                 const score_juu = new Image();
                 var juu = Math.floor(score / 10) % 10;
-                if(score==0){juu=10;}
+                if(score<10){juu=10;}
                 score_juu.src= number_list[juu];
-                ctx.drawImage(score_ichi,350,200);
-                ctx.drawImage(score_juu,300,200);
+                const score_hyaku = new Image();
+                var hyaku = Math.floor(score / 100) % 10;
+                if(score<100){hyaku=10;}
+                score_hyaku.src = number_list[hyaku];
+                ctx.drawImage(score_hyaku,350,200);
+                ctx.drawImage(score_juu,400,200);
+                ctx.drawImage(score_ichi,450,200);
             }
             drawbackground();
             // start();
