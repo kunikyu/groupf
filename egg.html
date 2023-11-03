@@ -22,7 +22,6 @@
             const ctx = canvas.getContext("2d");
             const x = 4;
             const y = 9;
-            const sleeptime = 350;
             const block_x = 110;
             const block_y = 80;
             const entity = 6;
@@ -72,6 +71,7 @@
             var wmelony=0;
             var dellist=[[0,1,1],[0,1,1]];
             var score=0;
+            var sleeptime = 400 - Math.floor(score/8);
             const obj = []
             function setimage(i){
                 obj.push({
@@ -104,7 +104,7 @@
                             image_background.addEventListener("load",function(){
                                 ctx.drawImage(image_background,0,0);
                             })
-                            system();
+                            system(sleeptime);
                         }
                     }
                 }else if(finish){
@@ -345,7 +345,6 @@
                 for(i=0;i<4;i++){
                     if(!mat[i][y-1]["fall"] && mat[i][y-1]["number"]){
                         dead = true;
-                        finish = true;
                     }
                 }
                 return dead;
@@ -367,6 +366,9 @@
             }
             // 定期的に関数を実行するための関数
             function system(waitSec){
+                console.log(waitSec);
+                sleeptime = 400 - Math.floor(score/8);
+                if(sleeptime<150){sleeptime=150}
                 setTimeout(function(){
                     if(resource>0){
                         if(resource==1){
@@ -394,7 +396,7 @@
                             draw();
                         }
                     }else if(death() && dellist[0][0]==0 && dellist[1][0]==0){
-                        sleep(sleeptime);
+                        sleep(350);
                         ctx.beginPath();
                         ctx.clearRect(0,0,800,800);
                         ctx.closePath();
@@ -537,10 +539,6 @@
                 var a=220;
                 const bttf = new Image();
                 bttf.src = "pictures/backtothefuture.png"
-                bttf.addEventListener("load",function(){
-                    ctx.drawImage(bttf,50,100,300,70,250,600,300,70);
-                    // ctx.drawImage(bttf,50,200);
-                });
                 scoreimage.addEventListener("load",function(){
                     ctx.drawImage(titleimage,0,45,400,100,205,105,390,195/2);
                     ctx.drawImage(qr,13,13,270,270,300,340,200,200);
@@ -552,6 +550,10 @@
                     ctx.drawImage(score_hyaku,350,a+60);
                     ctx.drawImage(score_juu,400,a+60);
                     ctx.drawImage(score_ichi,450,a+60);
+                    setTimeout(function(){
+                        ctx.drawImage(bttf,50,100,300,70,250,600,300,70);
+                        finish = true;
+                    },2000)
                 });
 
             }
