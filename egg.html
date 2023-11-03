@@ -14,8 +14,547 @@
         <!-- ここまで -->
 
         <!-- game 國久 -->
-        
-        
+        <canvas id="eggCanvas" width="800" height="800"></canvas>
+        <script>
+            const canvas = document.getElementById("eggCanvas");
+            const ctx = canvas.getContext("2d");
+            const x = 4;
+            const y = 9;
+            const sleeptime = 350;
+            const block_x = 110;
+            const block_y = 80;
+            const entity = 6;
+            const color_list = [
+                "pictures/kudamono_touka.png",
+                "pictures/suika_ue.png",
+                "pictures/suika_shita.png",
+                "pictures/meron.png",
+                "pictures/mikan.png",
+                "pictures/ichigo.png",
+                "pictures/pain.png"
+            ]
+            const number_list = [
+                "pictures/0.png",
+                "pictures/1.png",
+                "pictures/2.png",
+                "pictures/3.png",
+                "pictures/4.png",
+                "pictures/5.png",
+                "pictures/6.png",
+                "pictures/7.png",
+                "pictures/8.png",
+                "pictures/9.png",
+                "pictures/0_emp.png"
+            ]
+            const titleimage = new Image();
+            titleimage.src = "pictures/title_only.png"
+            const qr = new Image();
+            qr.src = "pictures/qr_kousennsai_hp.png"
+            let mat = [];
+            var first = true;
+            var pause = false;
+            var dead = false;
+            var resource = 0;
+            var setlist = [0,0,0,0];
+            var select = 1;
+            var finish = false;
+            var home = true;
+            var set = false;
+            var change = false;
+            var newobjx_1 = 0;
+            var newobjx_2 = 0;
+            var rightPressed=false;
+            var leftPressed=false;
+            var spacePressed=false;
+            var wmelonx=0;
+            var wmelony=0;
+            var dellist=[[0,1,1],[0,1,1]];
+            var score=0;
+            const obj = []
+            function setimage(i){
+                obj.push({
+                    number:i,
+                    fall:true,
+                    color:color_list[i]
+                });
+            }
+            for( i = 0; i < entity+1; i++){
+                setimage(i);
+            }
+
+            for(let i = 0; i < x; i++){
+                mat.push([]);
+                for(let j = 0; j < y; j++){
+                    mat[i].push(obj[0]);
+                }
+            }
+            document.addEventListener("keydown", keyDownHandler, true);
+            document.addEventListener("keyup", keyUpHandler, true);
+            // 入力判定
+            function keyDownHandler(e) {
+                if(home){
+                    if(!spacePressed){
+                        if(e.key == " "){
+                            spacePressed=!spacePressed
+                            home = !home
+                            const image_background = new Image();
+                            image_background.src="pictures/_haikei.png";
+                            image_background.addEventListener("load",function(){
+                                ctx.drawImage(image_background,0,0);
+                            })
+                            system();
+                        }
+                    }
+                }else if(finish){
+                    if(!spacePressed){
+                        if(e.key == " "){
+                            spacePressed=!spacePressed
+                            home = true;
+                            reset();
+                            drawbackground()
+                        }
+                    }
+                }else if(!dead && resource == 0 && !pause){
+                    if(!rightPressed && !leftPressed){
+                        if(e.key == "ArrowRight") {
+                            rightPressed = true;
+                            if(select==3){}
+                            else{select++;}
+                        }
+                        else if(e.key == "ArrowLeft") {
+                            leftPressed = true;
+                            if(select==1){}
+                            else{select--;}
+                        }
+                        drawselect();
+                    }
+                    if(!spacePressed){
+                        if(e.key == " "){
+                            spacePressed=!spacePressed
+                            changeline();
+                        }
+                    }
+                }
+
+            }
+            function keyUpHandler(e) {
+                if(rightPressed || leftPressed){
+                    if(e.key == "ArrowRight") {
+                        rightPressed = false;
+                    }
+                    else if(e.key == "ArrowLeft") {
+                        leftPressed = false;
+                    }
+                }
+                if(spacePressed){
+                    if(e.key == " "){
+                        spacePressed=!spacePressed
+                    }
+                }
+            }
+            function drawbackground(){
+                const image_background = new Image();
+                image_background.src="pictures/_haikei.png";
+                const title = new Image();
+                title.src = "pictures/title.png";
+                image_background.addEventListener("load", function (){
+                    ctx.drawImage(image_background,0,0);
+                });
+                title.addEventListener("load",function(){
+                    ctx.drawImage(title,0,0,400,200,100,250,600,300);
+                })
+            }
+            // 初期化
+            function reset(){
+                mat=[];
+                for(let i = 0; i < x; i++){
+                    mat.push([]);
+                    for(let j = 0; j < y; j++){
+                        mat[i].push(obj[0]);
+                    }
+                }
+                first = true;
+                pause = false;
+                dead = false;
+                resource = 0;
+                setlist = [0,0,0,0];
+                select = 1;
+                finish = false;
+                home = true;
+                set = false;
+                change = false;
+                newobjx_1 = 0;
+                newobjx_2 = 0;
+                rightPressed=false;
+                leftPressed=false;
+                spacePressed=false;
+                wmelonx=0;
+                wmelony=0;
+                dellist=[[0,1,1],[0,1,1]];
+                score=0;
+            }
+            // ゲーム背景
+            function back(){
+                ctx.beginPath();
+                ctx.rect(15,10,480,780);
+                ctx.fillStyle = "#000"
+                ctx.fill();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.rect(20,15,470,770);
+                ctx.fillStyle = "#0d0"
+                ctx.fill();
+                ctx.closePath();
+            }
+            function sleep(waitMsec) {
+                var startMsec = new Date();
+                while (new Date() - startMsec < waitMsec);
+            }
+            // 一段落下させる
+            function falling(){
+                if( dellist[0][0] || dellist[1][0]){
+                    var a = mat[dellist[0][1]][dellist[0][2]]["number"] == mat[dellist[0][1]][dellist[0][2]-1]["number"]
+                    var b = mat[dellist[1][1]][dellist[1][2]]["number"] == mat[dellist[1][1]][dellist[1][2]-1]["number"]
+                    if(a){
+                        deleteobj(0,dellist[0][1],dellist[0][2]);
+                    }
+                    if(b){
+                        deleteobj(1,dellist[1][1],dellist[1][2]);
+                    }
+                    dellist=[[0,1,1],[0,1,1]];
+                }else{
+                    change = false;
+                    for(i=0;i<x;i++){
+                        for(j=1;j<y;j++){
+                            if(mat[i][j]["number"]==0 ){continue;}
+                            if(mat[i][j]["fall"] && mat[i][j-1]["number"]==0){
+                                mat[i][j-1]=JSON.parse(JSON.stringify(mat[i][j]));
+                                mat[i][j]=obj[0];
+                                change = true;
+                                if(j==1){
+                                    mat[i][j-1]["fall"]=false;
+                                    if(mat[i][j-1]["number"]==1){
+                                        [resource,wmelonx,wmelony]=watermelon(i,j-1);
+                                    }
+                                }else if(mat[i][j-1]["fall"] && !mat[i][j-2]["fall"]){
+                                    pause=true;
+                                    mat[i][j-1]["fall"]=false;
+                                    if(mat[i][j-1]["number"]==1){
+                                        [resource,wmelonx,wmelony]=watermelon(i,j-1);
+                                    }
+                                    if(!dellist[0][0]){
+                                        dellist[0]=[1,i,j-1];
+                                    }else{
+                                        dellist[1]=[1,i,j-1];
+                                    }
+                                    pause=false;
+                                }
+                            }else if(mat[i][j]["fall"] && mat[i][j-1]["number"]!=0){
+                                pause=true;
+                                mat[i][j]["fall"]=false;
+                                change=true;
+                                if(mat[i][j]["number"]==1){
+                                    [resource,wmelonx,wmelony]=watermelon(i,j);
+                                }
+                                if(!dellist[0][0]){dellist[0]=[1,i,j];}
+                                else{dellist[1]=[1,i,j];}
+                                pause=false;
+                            }
+                        }
+                    }
+                }
+            }
+            // 選択している列を入れ替える
+            function changeline(){
+                for(i=0;i<y;i++){
+                    if( !mat[select][i]["fall"] || !mat[select-1][i]["fall"]){
+                        [mat[select][i],mat[select-1][i]] = [mat[select-1][i],mat[select][i]];
+                    }
+                    if(wmelonx==select){
+                        wmelonx--;
+                    }else if(wmelonx == select-1){
+                        wmelonx++;
+                    }
+                    if(dellist[0][1]==select){
+                        dellist[0][1]--;
+                    }else if(dellist[1][1] == select-1){
+                        dellist[1][1]++;
+                    }
+                }
+                back();
+                drawbar();
+                drawScore(new Image(),score);
+                drawselect();
+                for(i=0;i<x;i++){
+                    for(j=y-1;j>-1;j--){
+                        drawobj(new Image(), i,j);
+                    }
+                }
+                for(i=0;i<x;i++){
+                    drawnext(new Image(),i);
+                }
+            }
+            // 新しく表示するタイルの生成
+            function newobj(){
+                if(!set){
+                    newobjx_1 = Math.floor( Math.random() * (x) );
+                    newobjx_2 = Math.floor( Math.random() * (x) );
+                    while(newobjx_1 == newobjx_2){
+                        newobjx_2 = Math.floor( Math.random() * (x) );
+                    }
+                    set = true;
+                    setlist[newobjx_1] = Math.floor( Math.random() * (entity)) + 1;
+                    setlist[newobjx_2] = Math.floor( Math.random() * (entity)) + 1;
+                    while(setlist[newobjx_1]==1 && setlist[newobjx_2]==1){
+                        setlist[newobjx_2] = Math.floor( Math.random() * (entity)) + 1;
+                    }
+                }
+                if(!change){
+                    for(i=0;i<x;i++){
+                        mat[i][y-1] = JSON.parse(JSON.stringify(obj[setlist[i]]));
+                    }
+                    set = false;
+                    setlist=[0,0,0,0];
+                }
+            }
+            // くっついたタイルの削除
+            function deleteobj(n,a,b){
+                if(mat[a][b]["number"]!=0 && mat[a][b]["number"]==mat[a][b-1]["number"]){
+                    mat[a][b]=obj[0];
+                    mat[a][b-1]=obj[0];
+                    score+=10
+                }
+                dellist[n]=[0,1,1];
+            }
+            // タイルの表示
+            function drawobj(image,i,j){
+                image.src=mat[i][j]["color"];
+                if(first){
+                    image.addEventListener("load",function(){
+                        ctx.drawImage(image,0,0,300,300,30+(block_x+2)*i,25+(block_y+2)*(y-j-1),block_x, block_y);
+                    })
+                }else{
+                    ctx.drawImage(image,0,0,300,300,30+(block_x+2)*i,25+(block_y+2)*(y-j-1),block_x, block_y);
+                }
+            }
+            // ゲームオーバー判定
+            function death(){
+                dead = false;
+                for(i=0;i<4;i++){
+                    if(!mat[i][y-1]["fall"] && mat[i][y-1]["number"]){
+                        dead = true;
+                        finish = true;
+                    }
+                }
+                return dead;
+            }
+            // 画面下部のセレクトバーの表示
+            function drawselect(){
+                for(j=0; j<x; j++){
+                    ctx.beginPath();
+                    ctx.rect(30+(block_x+2)*j, 25+(block_y+2)*(y), block_x, 10);
+                    if(j==select || j==select-1){ctx.fillStyle = "#f00";}
+                    else{ctx.fillStyle = "#000";}
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+            function drawnext(image,i){
+                image.src=color_list[setlist[i]];
+                ctx.drawImage(image,0,0,300,300,30+(block_x+2)*i,25+(block_y+2)*(y-8-1),block_x, block_y);
+            }
+            // 定期的に関数を実行するための関数
+            function system(waitSec){
+                setTimeout(function(){
+                    if(resource>0){
+                        if(resource==1){
+                            system(sleeptime);
+                            mat[wmelonx][wmelony]=JSON.parse(JSON.stringify(obj[0]));
+                            resource=0;
+                            score+=1;
+                            draw();
+                        }else if(resource==2){
+                            system(sleeptime);
+                            mat[wmelonx][wmelony]=JSON.parse(JSON.stringify(obj[0]));
+                            mat[wmelonx][wmelony-1]=JSON.parse(JSON.stringify(obj[0]));
+                            resource=0;
+                            score+=10;
+                            draw();
+                        }else{
+                            system(sleeptime);
+                            mat[wmelonx][wmelony-1]=JSON.parse(JSON.stringify(mat[wmelonx][wmelony]));
+                            mat[wmelonx][wmelony]=JSON.parse(JSON.stringify(obj[0]));
+                            resource--;
+                            if(resource==4){score+=40}
+                            if(resource==7){score+=150}
+                            if(resource==9){score+=200}
+                            wmelony--;
+                            draw();
+                        }
+                    }else if(death() && dellist[0][0]==0 && dellist[1][0]==0){
+                        sleep(sleeptime);
+                        ctx.beginPath();
+                        ctx.clearRect(0,0,800,800);
+                        ctx.closePath();
+                        const image_background = new Image();
+                        image_background.src="pictures/_haikei.png";
+                        image_background.addEventListener("load",function(){
+                            ctx.drawImage(image_background,0,0);
+                            result();
+                        })
+                    }else{
+                        falling();
+                        system(sleeptime);
+                        draw();
+                        first=false;
+                    }
+                },waitSec)
+            }
+            // 一段目下の棒の表示
+            function drawbar(){
+                ctx.beginPath();
+                ctx.rect(25,101,(block_x+4)*4,3);
+                ctx.fillStyle = "#fff";
+                ctx.fill();
+                ctx.closePath();
+            }
+            // スコアの表示
+            function drawScore(image,score){
+                ctx.beginPath();
+                ctx.rect(50+(block_x+2)*i,10,270,400);
+                ctx.fillStyle = "#000"
+                ctx.fill();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.rect(55+(block_x+2)*i,15+260/4+2.5,260,390-260/4-2.5);
+                ctx.fillStyle = "#0d0"
+                ctx.fill();
+                ctx.closePath();
+                image.src = "pictures/_score.png"
+                const score_ichi = new Image();
+                var ichi = score % 10;
+                score_ichi.src= number_list[ichi];
+                const score_juu = new Image();
+                var juu = Math.floor(score / 10) % 10;
+                if(score<10){juu=10;}
+                score_juu.src= number_list[juu];
+                const score_hyaku = new Image();
+                var hyaku = Math.floor(score / 100) % 10;
+                if(score<100){hyaku=10;}
+                score_hyaku.src = number_list[hyaku];
+                const score_sen = new Image();
+                var sen = Math.floor(score / 1000) % 10;
+                if(score<1000){sen=10;}
+                score_sen.src = number_list[sen];
+                if(first){
+                    image.addEventListener("load",function(){
+                        ctx.drawImage(titleimage,0,45,400,100,50+(block_x+2)*i+5,15,260,260/4);
+                        ctx.drawImage(qr,13,13,270,270,50+(block_x+2)*i+(270-150)/2,200,150,150);
+                        ctx.drawImage(image,50+(block_x+2)*i,25+70);
+                        ctx.drawImage(score_sen,550,75+70);
+                        ctx.drawImage(score_hyaku,600,75+70);
+                        ctx.drawImage(score_juu,650,75+70);
+                        ctx.drawImage(score_ichi,700,75+70);
+                        ctx.font = "36px serif"
+                        ctx.fillStyle = "#000"
+                        ctx.fillText("高専祭HP",550,390);
+                    })
+                }else{
+                    ctx.drawImage(titleimage,0,45,400,100,50+(block_x+2)*i+5,15,260,260/4);
+                    ctx.drawImage(qr,13,13,270,270,50+(block_x+2)*i+(270-150)/2,200,150,150);
+                    ctx.drawImage(image,50+(block_x+2)*i,25+70);
+                    ctx.drawImage(score_sen,550,75+70);
+                    ctx.drawImage(score_hyaku,600,75+70);
+                    ctx.drawImage(score_juu,650,75+70);
+                    ctx.drawImage(score_ichi,700,75+70);
+                    ctx.font = "36px serif"
+                    ctx.fillStyle = "#000"
+                    ctx.fillText("高専祭HP",550,390);
+                }
+            }
+            // スイカの処理
+            function watermelon(i,j){
+                const list = mat[i];
+                var fluits = 0;
+                for(k=1;k<=j;k++){
+                    if(list[j-k]["number"]==2){
+                        return [k+1,i,j];
+                    }
+                }
+                return [1,i,j];
+            }
+            // ゲームの表示
+            function draw(){
+                newobj();
+                back();
+                drawbar();
+                drawScore(new Image(),score);
+                drawselect();
+                for(i=0;i<x;i++){
+                    for(j=y-1;j>-1;j--){
+                        drawobj(new Image(), i,j);
+                    }
+                }
+                for(i=0;i<x;i++){
+                    drawnext(new Image(),i);
+                }
+            }
+            function empty(){
+                // Hi!
+            }
+            // リザルト画面の表示
+            function result(){
+                empty();
+                ctx.beginPath();
+                ctx.rect(200,100,400,600);
+                ctx.fillStyle="#000";
+                ctx.fill();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.rect(205,205,390,490);
+                ctx.fillStyle="#0d0";
+                ctx.fill();
+                ctx.closePath();
+                const scoreimage = new Image();
+                scoreimage.src ="pictures/_score.png" 
+                const score_ichi = new Image();
+                var ichi = score % 10;
+                score_ichi.src= number_list[ichi];
+                const score_juu = new Image();
+                var juu = Math.floor(score / 10) % 10;
+                if(score<10){juu=10;}
+                score_juu.src= number_list[juu];
+                const score_hyaku = new Image();
+                var hyaku = Math.floor(score / 100) % 10;
+                if(score<100){hyaku=10;}
+                score_hyaku.src = number_list[hyaku];
+                const score_sen = new Image();
+                var sen = Math.floor(score / 1000) % 10;
+                if(score<1000){sen=10;}
+                score_sen.src = number_list[sen];
+                var a=220;
+                const bttf = new Image();
+                bttf.src = "pictures/backtothefuture.png"
+                bttf.addEventListener("load",function(){
+                    ctx.drawImage(bttf,50,100,300,70,250,600,300,70);
+                    // ctx.drawImage(bttf,50,200);
+                });
+                scoreimage.addEventListener("load",function(){
+                    ctx.drawImage(titleimage,0,45,400,100,205,105,390,195/2);
+                    ctx.drawImage(qr,13,13,270,270,300,340,200,200);
+                    ctx.font = "36px serif"
+                    ctx.fillStyle = "#000"
+                    ctx.fillText("高専祭HP",320,580);
+                    ctx.drawImage(scoreimage,280,a);
+                    ctx.drawImage(score_sen,300,a+60);
+                    ctx.drawImage(score_hyaku,350,a+60);
+                    ctx.drawImage(score_juu,400,a+60);
+                    ctx.drawImage(score_ichi,450,a+60);
+                });
+
+            }
+            drawbackground();
+        </script>
         <!-- 國久ここまで -->
 
         <!-- 柿原 編集可能 -->
