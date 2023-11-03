@@ -100,7 +100,7 @@
                             spacePressed=!spacePressed
                             home = !home
                             const image_background = new Image();
-                            image_background.src="pictures/_haikei.png";
+                            image_background.src="pictures/haikei.png";
                             image_background.addEventListener("load",function(){
                                 ctx.drawImage(image_background,0,0);
                             })
@@ -156,7 +156,7 @@
             }
             function drawbackground(){
                 const image_background = new Image();
-                image_background.src="pictures/_haikei.png";
+                image_background.src="pictures/haikei.png";
                 const title = new Image();
                 title.src = "pictures/title.png";
                 image_background.addEventListener("load", function (){
@@ -399,7 +399,7 @@
                         ctx.clearRect(0,0,800,800);
                         ctx.closePath();
                         const image_background = new Image();
-                        image_background.src="pictures/_haikei.png";
+                        image_background.src="pictures/haikei.png";
                         image_background.addEventListener("load",function(){
                             ctx.drawImage(image_background,0,0);
                             result();
@@ -432,7 +432,7 @@
                 ctx.fillStyle = "#0d0"
                 ctx.fill();
                 ctx.closePath();
-                image.src = "pictures/_score.png"
+                image.src = "pictures/score.png"
                 const score_ichi = new Image();
                 var ichi = score % 10;
                 score_ichi.src= number_list[ichi];
@@ -518,7 +518,7 @@
                 ctx.fill();
                 ctx.closePath();
                 const scoreimage = new Image();
-                scoreimage.src ="pictures/_score.png" 
+                scoreimage.src ="pictures/score.png" 
                 const score_ichi = new Image();
                 var ichi = score % 10;
                 score_ichi.src= number_list[ichi];
