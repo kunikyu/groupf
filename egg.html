@@ -96,7 +96,11 @@
                         if(e.key == " "){
                             spacePressed=!spacePressed
                             home = !home
-                            drawbackground();
+                            const image_background = new Image();
+                            image_background.src="pictures/_haikei.png";
+                            image_background.addEventListener("load",function(){
+                                ctx.drawImage(image_background,0,0);
+                            })
                             system();
                         }
                     }
@@ -104,6 +108,7 @@
                     if(!spacePressed){
                         if(e.key == " "){
                             spacePressed=!spacePressed
+                            home = true;
                             reset();
                             drawbackground()
                         }
@@ -153,10 +158,10 @@
                 title.src = "pictures/title.png";
                 image_background.addEventListener("load", function (){
                     ctx.drawImage(image_background,0,0);
-                    if(home){
-                        ctx.drawImage(title,1,1,400,200,100,250,600,300);
-                    }
                 });
+                title.addEventListener("load",function(){
+                    ctx.drawImage(title,0,0,400,200,100,250,600,300);
+                })
             }
             // 初期化
             function reset(){
@@ -284,6 +289,9 @@
                         drawobj(new Image(), i,j);
                     }
                 }
+                for(i=0;i<x;i++){
+                    drawnext(new Image(),i);
+                }
             }
             // 新しく表示するタイルの生成
             function newobj(){
@@ -349,6 +357,10 @@
                     ctx.fill();
                     ctx.closePath();
                 }
+            }
+            function drawnext(image,i){
+                image.src=color_list[setlist[i]];
+                ctx.drawImage(image,0,0,300,300,30+(block_x+2)*i,25+(block_y+2)*(y-8-1),block_x, block_y);
             }
             // 定期的に関数を実行するための関数
             function system(waitSec){
@@ -442,6 +454,9 @@
                         ctx.drawImage(score_hyaku,600,75+70);
                         ctx.drawImage(score_juu,650,75+70);
                         ctx.drawImage(score_ichi,700,75+70);
+                        ctx.font = "36px serif"
+                        ctx.fillStyle = "#000"
+                        ctx.fillText("高専祭HP",550,390);
                     })
                 }else{
                     ctx.drawImage(titleimage,0,45,400,100,50+(block_x+2)*i+5,15,260,260/4);
@@ -451,6 +466,9 @@
                     ctx.drawImage(score_hyaku,600,75+70);
                     ctx.drawImage(score_juu,650,75+70);
                     ctx.drawImage(score_ichi,700,75+70);
+                    ctx.font = "36px serif"
+                    ctx.fillStyle = "#000"
+                    ctx.fillText("高専祭HP",550,390);
                 }
             }
             // スイカの処理
@@ -475,6 +493,9 @@
                     for(j=y-1;j>-1;j--){
                         drawobj(new Image(), i,j);
                     }
+                }
+                for(i=0;i<x;i++){
+                    drawnext(new Image(),i);
                 }
             }
             function empty(){
@@ -511,8 +532,13 @@
                 if(score<1000){sen=10;}
                 score_sen.src = number_list[sen];
                 var a=220;
+                const bttf = new Image();
+                bttf.src = "pictures/backtothefuture.png"
+                bttf.addEventListener("load",function(){
+                    ctx.drawImage(bttf,50,100,300,70,250,600,300,70);
+                    // ctx.drawImage(bttf,50,200);
+                });
                 scoreimage.addEventListener("load",function(){
-                    // ctx.drawImage(titleimage,200,150);
                     ctx.drawImage(titleimage,0,45,400,100,205,105,390,195/2);
                     ctx.drawImage(qr,13,13,270,270,300,340,200,200);
                     ctx.font = "36px serif"
@@ -523,7 +549,8 @@
                     ctx.drawImage(score_hyaku,350,a+60);
                     ctx.drawImage(score_juu,400,a+60);
                     ctx.drawImage(score_ichi,450,a+60);
-                })
+                });
+
             }
             drawbackground();
         </script>
