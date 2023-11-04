@@ -67,6 +67,7 @@
             var rightPressed=false;
             var leftPressed=false;
             var spacePressed=false;
+            var CtrlPressed=false;
             var wmelonx=0;
             var wmelony=0;
             var dellist=[[0,1,1],[0,1,1]];
@@ -136,6 +137,12 @@
                             changeline();
                         }
                     }
+                    if(!CtrlPressed){
+                        if(e.key == "Control"){
+                            CtrlPressed = true;
+                        }
+                    }
+                    
                 }
 
             }
@@ -150,7 +157,12 @@
                 }
                 if(spacePressed){
                     if(e.key == " "){
-                        spacePressed=!spacePressed
+                        spacePressed=!spacePressed;
+                    }
+                }
+                if(CtrlPressed){
+                    if(e.key == "Control"){
+                        CtrlPressed = !CtrlPressed;
                     }
                 }
             }
@@ -162,6 +174,7 @@
                 image_background.addEventListener("load", function (){
                     ctx.drawImage(image_background,0,0);
                 });
+                sleep(10);
                 title.addEventListener("load",function(){
                     ctx.drawImage(title,0,0,400,200,100,250,600,300);
                 })
@@ -366,9 +379,12 @@
             }
             // 定期的に関数を実行するための関数
             function system(waitSec){
-                console.log(waitSec);
-                sleeptime = 400 - Math.floor(score/8);
-                if(sleeptime<150){sleeptime=150}
+                if(!CtrlPressed){
+                    sleeptime = 400 - Math.floor(score/8);
+                    if(sleeptime<150){sleeptime=150}
+                }else{
+                    sleeptime = 100;
+                }
                 setTimeout(function(){
                     if(resource>0){
                         if(resource==1){
@@ -562,6 +578,7 @@
 
         <!-- 柿原 編集可能 -->
         <div class="move">
+        <p>PCにのみ対応しています</p>
         <p>右へ移動　　…右矢印</p>
         <p>左へ移動　　…左矢印</p>
         <p>列の入れ替え…Space</p>
