@@ -75,7 +75,7 @@
             var wmelony=0;
             var dellist=[[0,1,1],[0,1,1]];
             var score=0;
-            var sleeptime = 800 - Math.floor(score/10);
+            var sleeptime = 600 - Math.floor(score/8);
             const obj = []
             function setimage(i){
                 obj.push({
@@ -383,7 +383,7 @@
             // 定期的に関数を実行するための関数
             function system(waitSec){
                 if(!CtrlPressed){
-                    sleeptime = 800 - Math.floor(score/10);
+                    sleeptime = 600 - Math.floor(score/8);
                     if(sleeptime<150){sleeptime=150}
                 }else{
                     sleeptime = 80;
