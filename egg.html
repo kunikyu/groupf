@@ -75,7 +75,7 @@
             var wmelony=0;
             var dellist=[[0,1,1],[0,1,1]];
             var score=0;
-            var sleeptime = 400 - Math.floor(score/8);
+            var sleeptime = 800 - Math.floor(score/10);
             const obj = []
             function setimage(i){
                 obj.push({
@@ -383,7 +383,7 @@
             // 定期的に関数を実行するための関数
             function system(waitSec){
                 if(!CtrlPressed){
-                    sleeptime = 400 - Math.floor(score/8);
+                    sleeptime = 800 - Math.floor(score/10);
                     if(sleeptime<150){sleeptime=150}
                 }else{
                     sleeptime = 80;
@@ -574,6 +574,14 @@
                         finish = true;
                     },2000)
                 });
+                // bttf.addEventListener("click",function(){
+                //     home = true;
+                //     ctx.beginPath();
+                //     ctx.clearRect(0,0,800,800);
+                //     ctx.closePath();
+                //     reset();
+                //     drawbackground();
+                // })
             }
             drawbackground();
         </script>
