@@ -1,6 +1,6 @@
 /* 柿原担当 */
 body{
-    background-color: rgb(147, 223, 223);
+    background-color: rgb(170, 230, 230);
 }
 .title{
     text-align: center;
@@ -26,4 +26,7 @@ p{
     text-align: center;
     font-size: 10pt;
     color: gray;
+}
+.explain{
+    text-align: center;
 }

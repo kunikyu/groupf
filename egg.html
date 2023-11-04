@@ -9,10 +9,13 @@
     <body>
         <!-- 柿原 編集可能 -->
         <div class="title">
-        <h1><strong>スイカでゲーム</strong></h1>
+            <h1><strong>スイカでゲーム</strong></h1>
         </div>
         <!-- ここまで -->
-
+        <div class="explain">
+            <h2>ルール</h2>
+            <p>４列に果物がふってきます。下の赤い線が選択している列を示しています。<br>左右矢印キーで選択している列を変更、スペースキーで選択している列を入れ替えます。<br>同じ果物を縦に２個積むとその２個の果物が消えます。<br>また、下のスイカと上のスイカでほかの果物をはさむとはさまれた果物とスイカがすべて消えます。</p>
+        </div>
         <!-- game 國久 -->
         <div id="canvas_wrapper">
             <canvas id="eggCanvas" width="800" height="800"></canvas>
@@ -383,7 +386,7 @@
                     sleeptime = 400 - Math.floor(score/8);
                     if(sleeptime<150){sleeptime=150}
                 }else{
-                    sleeptime = 100;
+                    sleeptime = 80;
                 }
                 setTimeout(function(){
                     if(resource>0){
@@ -578,10 +581,7 @@
 
         <!-- 柿原 編集可能 -->
         <div class="move">
-        <p>PCにのみ対応しています</p>
-        <p>右へ移動　　…右矢印</p>
-        <p>左へ移動　　…左矢印</p>
-        <p>列の入れ替え…Space</p>
+            <p>PCにのみ対応しています<br>右へ移動　　…右矢印<br>左へ移動　　…左矢印<br>列の入れ替え…Space<br>加速　　　　…Ctrl 　</p>
         </div>
         <!-- ここまで -->
         <div class="footer">
